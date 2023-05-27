@@ -5,7 +5,7 @@ import "./Logo.css";
 
 const Logo = () => {
   return (
-    <div className="ma4 mt0">
+    <div className="center ma4 mt0">
       <Tilty
         max={55}
         className="Tilt br2 shadow-2"
