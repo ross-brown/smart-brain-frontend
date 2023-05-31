@@ -10,6 +10,7 @@ import {useState} from "react";
 function App() {
   const [input, setInput] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [box, setBox] = useState({});
 
   const returnRequestOptions = (imageURL) => {
     const PAT = "2ca083bd7a5f47a786f0d591d0d75cdf";
@@ -46,6 +47,25 @@ function App() {
 
     return requestOptions;
   };
+  
+  const calculateFaceLocation = (data) => {
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage");
+    const width = Number(image.width);
+    const height = Number(image.height);
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
+    };
+  };
+
+  const displayFaceBox = (box) => {
+    console.log('displayFaceBox ran', box);
+    setBox(box);
+  };
 
   const onInputChange = (e) => {
     setInput(e.target.value);
@@ -59,8 +79,9 @@ function App() {
       returnRequestOptions(input)
     )
       .then((response) => response.json())
-      .then((result) =>
-        console.log(result.outputs[0].data.regions[0].region_info.bounding_box)
+      .then(
+        (result) => displayFaceBox(calculateFaceLocation(result))
+        // console.log(result.outputs[0].data.regions[0].region_info.bounding_box)
       )
       .catch((error) => console.log("error", error));
   };
@@ -75,7 +96,7 @@ function App() {
         onInputChange={onInputChange}
         onButtonSubmit={onButtonSubmit}
       />
-      <FaceRecognition imageUrl={imageUrl} />
+      <FaceRecognition box={box} imageUrl={imageUrl} />
     </div>
   );
 }
