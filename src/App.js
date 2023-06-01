@@ -14,6 +14,7 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
   const [box, setBox] = useState({});
   const [route, setRoute] = useState("signin");
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const returnRequestOptions = (imageURL) => {
     const PAT = "2ca083bd7a5f47a786f0d591d0d75cdf";
@@ -66,7 +67,6 @@ function App() {
   };
 
   const displayFaceBox = (box) => {
-    console.log("displayFaceBox ran", box);
     setBox(box);
   };
 
@@ -82,21 +82,23 @@ function App() {
       returnRequestOptions(input)
     )
       .then((response) => response.json())
-      .then(
-        (result) => displayFaceBox(calculateFaceLocation(result))
-        // console.log(result.outputs[0].data.regions[0].region_info.bounding_box)
-      )
+      .then((result) => displayFaceBox(calculateFaceLocation(result)))
       .catch((error) => console.log("error", error));
   };
 
   const onRouteChange = (route) => {
+    if (route === "signout") {
+      setIsSignedIn(false);
+    } else if (route === "home") {
+      setIsSignedIn(true);
+    }
     setRoute(route);
   };
 
   return (
     <div className="App">
       <ParticlesBg type={"cobweb"} color="#FFFFFF" bg={true} />
-      <Navigation onRouteChange={onRouteChange} />
+      <Navigation isSignedIn={isSignedIn} onRouteChange={onRouteChange} />
       {route === "home" ? (
         <div>
           <Logo />
@@ -110,7 +112,7 @@ function App() {
       ) : route === "signin" ? (
         <Signin onRouteChange={onRouteChange} />
       ) : (
-        <Register onRouteChange={onRouteChange}/>
+        <Register onRouteChange={onRouteChange} />
       )}
     </div>
   );
