@@ -106,13 +106,28 @@ function App() {
       returnRequestOptions(input)
     )
       .then((response) => response.json())
-      .then((result) => displayFaceBox(calculateFaceLocation(result)))
+      .then((result) => {
+        if (result) {
+          fetch("http://localhost:3000/image", {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              id: user.id,
+            }),
+          })
+            .then((res) => res.json())
+            .then((count) => setUser(Object.assign(user, {entries: count})));
+        }
+        displayFaceBox(calculateFaceLocation(result));
+      })
       .catch((error) => console.log("error", error));
   };
 
   const onRouteChange = (route) => {
     if (route === "signout") {
       setIsSignedIn(false);
+      setImageUrl("");
+      setBox({});
     } else if (route === "home") {
       setIsSignedIn(true);
     }
