@@ -1,6 +1,41 @@
-import React from "react";
+import React, {useState} from "react";
 
-const Register = ({onRouteChange}) => {
+const Register = ({onRouteChange, loadUser}) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  const onNameChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const onEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const onPasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const onSubmitSignIn = () => {
+    fetch("http://localhost:3000/register", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        name: name,
+      }),
+    })
+      .then((res) => res.json())
+      .then((user) => {
+        if (user) {
+          loadUser(user);
+          onRouteChange("home");
+        }
+      });
+  };
+
   return (
     <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
       <main className="pa4 black-80">
@@ -16,6 +51,7 @@ const Register = ({onRouteChange}) => {
                 type="text"
                 name="name"
                 id="name"
+                onChange={onNameChange}
               />
             </div>
             <div className="mt3">
@@ -27,6 +63,7 @@ const Register = ({onRouteChange}) => {
                 type="email"
                 name="email-address"
                 id="email-address"
+                onChange={onEmailChange}
               />
             </div>
             <div className="mv3">
@@ -38,12 +75,13 @@ const Register = ({onRouteChange}) => {
                 type="password"
                 name="password"
                 id="password"
+                onChange={onPasswordChange}
               />
             </div>
           </fieldset>
           <div className="">
             <input
-              onClick={() => onRouteChange('home')}
+              onClick={onSubmitSignIn}
               className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
               type="submit"
               value="Create Account"

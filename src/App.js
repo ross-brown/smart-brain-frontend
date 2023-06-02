@@ -7,7 +7,7 @@ import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import Rank from "./components/Rank/Rank";
 import Signin from "./components/Signin/Signin";
 import Register from "./components/Register/Register";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 function App() {
   const [input, setInput] = useState("");
@@ -15,6 +15,20 @@ function App() {
   const [box, setBox] = useState({});
   const [route, setRoute] = useState("signin");
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    email: "",
+    entries: 0,
+    joined: "",
+  });
+
+  // useEffect(() => {
+  //   fetch("http://localhost:3000/")
+  //     .then((res) => res.json())
+  //     .then(console.log)
+  //     .catch(err => console.log('There was an error', err))
+  // }, []);
 
   const returnRequestOptions = (imageURL) => {
     const PAT = "2ca083bd7a5f47a786f0d591d0d75cdf";
@@ -52,6 +66,16 @@ function App() {
     return requestOptions;
   };
 
+  const loadUser = (data) => {
+    setUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined,
+    });
+  };
+
   const calculateFaceLocation = (data) => {
     const clarifaiFace =
       data.outputs[0].data.regions[0].region_info.bounding_box;
@@ -74,7 +98,7 @@ function App() {
     setInput(e.target.value);
   };
 
-  const onButtonSubmit = () => {
+  const onPictureSubmit = () => {
     setImageUrl(input);
 
     fetch(
@@ -102,17 +126,17 @@ function App() {
       {route === "home" ? (
         <div>
           <Logo />
-          <Rank />
+          <Rank name={user.name} entries={user.entries} />
           <ImageLinkForm
             onInputChange={onInputChange}
-            onButtonSubmit={onButtonSubmit}
+            onPictureSubmit={onPictureSubmit}
           />
           <FaceRecognition box={box} imageUrl={imageUrl} />
         </div>
-      ) : route === "signin" ? (
-        <Signin onRouteChange={onRouteChange} />
+      ) : route === "signin" || route === "signout" ? (
+        <Signin loadUser={loadUser} onRouteChange={onRouteChange} />
       ) : (
-        <Register onRouteChange={onRouteChange} />
+        <Register loadUser={loadUser} onRouteChange={onRouteChange} />
       )}
     </div>
   );
