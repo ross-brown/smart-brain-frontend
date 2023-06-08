@@ -7,7 +7,7 @@ import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import Rank from "./components/Rank/Rank";
 import Signin from "./components/Signin/Signin";
 import Register from "./components/Register/Register";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 function App() {
   const [input, setInput] = useState("");
@@ -22,13 +22,6 @@ function App() {
     entries: 0,
     joined: "",
   });
-
-  // useEffect(() => {
-  //   fetch("http://localhost:3000/")
-  //     .then((res) => res.json())
-  //     .then(console.log)
-  //     .catch(err => console.log('There was an error', err))
-  // }, []);
 
   const returnRequestOptions = (imageURL) => {
     const PAT = "2ca083bd7a5f47a786f0d591d0d75cdf";
@@ -116,18 +109,33 @@ function App() {
             }),
           })
             .then((res) => res.json())
-            .then((count) => setUser(Object.assign(user, {entries: count})));
+            .then((count) => {
+              setUser({...user, entries: count});
+            })
+            .catch((err) => console.log(err));
         }
         displayFaceBox(calculateFaceLocation(result));
       })
       .catch((error) => console.log("error", error));
   };
 
+  const clearState = () => {
+    setIsSignedIn(false);
+    setImageUrl("");
+    setBox({});
+    setInput("");
+    setUser({
+      id: "",
+      name: "",
+      email: "",
+      entries: 0,
+      joined: "",
+    });
+  };
+
   const onRouteChange = (route) => {
     if (route === "signout") {
-      setIsSignedIn(false);
-      setImageUrl("");
-      setBox({});
+      clearState();
     } else if (route === "home") {
       setIsSignedIn(true);
     }
