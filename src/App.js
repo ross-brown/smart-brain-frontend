@@ -7,6 +7,7 @@ import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import Rank from "./components/Rank/Rank";
 import Signin from "./components/Signin/Signin";
 import Register from "./components/Register/Register";
+import {trackPromise} from "react-promise-tracker";
 import {useState} from "react";
 
 function App() {
@@ -57,30 +58,32 @@ function App() {
 
   const onPictureSubmit = () => {
     setImageUrl(input);
-    fetch("https://smart-brain-backend-b21u.onrender.com/imageurl", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({input}),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result) {
-          fetch("https://smart-brain-backend-b21u.onrender.com/image", {
-            method: "PUT",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-              id: user.id,
-            }),
-          })
-            .then((res) => res.json())
-            .then((count) => {
-              setUser({...user, entries: count});
-            })
-            .catch((err) => console.log(err));
-        }
-        displayFaceBox(calculateFaceLocation(result));
+    trackPromise(
+      fetch("https://smart-brain-backend-b21u.onrender.com/imageurl", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({input}),
       })
-      .catch((error) => console.log("error", error));
+        .then((response) => response.json())
+        .then((result) => {
+          if (result) {
+            fetch("https://smart-brain-backend-b21u.onrender.com/image", {
+              method: "PUT",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                id: user.id,
+              }),
+            })
+              .then((res) => res.json())
+              .then((count) => {
+                setUser({...user, entries: count});
+              })
+              .catch((err) => console.log(err));
+          }
+          displayFaceBox(calculateFaceLocation(result));
+        })
+        .catch((error) => console.log("error", error))
+    );
   };
 
   const clearState = () => {
