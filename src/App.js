@@ -13,7 +13,7 @@ import {useState} from "react";
 function App() {
   const [input, setInput] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [box, setBox] = useState({});
+  const [boxes, setBoxes] = useState([]);
   const [route, setRoute] = useState("signin");
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [user, setUser] = useState({
@@ -34,22 +34,25 @@ function App() {
     });
   };
 
-  const calculateFaceLocation = (data) => {
-    const clarifaiFace =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
+  const calculateFaceLocations = (data) => {
+    const clarifaiFaces = data.outputs[0].data.regions;
     const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - clarifaiFace.right_col * width,
-      bottomRow: height - clarifaiFace.bottom_row * height,
-    };
+
+    return clarifaiFaces.map((region) => {
+      const boundingBox = region.region_info.bounding_box;
+      return {
+        leftCol: boundingBox.left_col * width,
+        topRow: boundingBox.top_row * height,
+        rightCol: width - boundingBox.right_col * width,
+        bottomRow: height - boundingBox.bottom_row * height,
+      };
+    });
   };
 
-  const displayFaceBox = (box) => {
-    setBox(box);
+  const displayFaceBoxes = (boxes) => {
+    setBoxes(boxes);
   };
 
   const onInputChange = (e) => {
@@ -80,7 +83,7 @@ function App() {
               })
               .catch((err) => console.log(err));
           }
-          displayFaceBox(calculateFaceLocation(result));
+          displayFaceBoxes(calculateFaceLocations(result));
         })
         .catch((error) => console.log("error", error))
     );
@@ -89,7 +92,7 @@ function App() {
   const clearState = () => {
     setIsSignedIn(false);
     setImageUrl("");
-    setBox({});
+    setBoxes([]);
     setInput("");
     setUser({
       id: "",
@@ -121,7 +124,7 @@ function App() {
             onInputChange={onInputChange}
             onPictureSubmit={onPictureSubmit}
           />
-          <FaceRecognition box={box} imageUrl={imageUrl} />
+          <FaceRecognition boxes={boxes} imageUrl={imageUrl} />
         </div>
       ) : route === "signin" || route === "signout" ? (
         <Signin loadUser={loadUser} onRouteChange={onRouteChange} />
