@@ -121,6 +121,7 @@ function App() {
           <Logo />
           <Rank name={user.name} entries={user.entries} />
           <ImageLinkForm
+            boxes={boxes}
             onInputChange={onInputChange}
             onPictureSubmit={onPictureSubmit}
           />
