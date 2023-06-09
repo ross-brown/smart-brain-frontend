@@ -4,11 +4,13 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'tachyons';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
+    <LoadingIndicator />
   </React.StrictMode>
 );
 

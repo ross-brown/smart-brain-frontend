@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {trackPromise} from "react-promise-tracker";
 
 const Signin = ({onRouteChange, loadUser}) => {
   const [signInEmail, setSignInEmail] = useState("");
@@ -13,21 +14,23 @@ const Signin = ({onRouteChange, loadUser}) => {
   };
 
   const onSubmitSignIn = () => {
-    fetch("https://smart-brain-backend-b21u.onrender.com/signin", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        email: signInEmail,
-        password: signInPassword,
-      }),
-    })
-      .then((res) => res.json())
-      .then((user) => {
-        if (user.id) {
-          loadUser(user);
-          onRouteChange("home");
-        }
-      });
+    trackPromise(
+      fetch("https://smart-brain-backend-b21u.onrender.com/signin", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          email: signInEmail,
+          password: signInPassword,
+        }),
+      })
+        .then((res) => res.json())
+        .then((user) => {
+          if (user.id) {
+            loadUser(user);
+            onRouteChange("home");
+          }
+        })
+    );
   };
 
   return (

@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {trackPromise} from "react-promise-tracker";
 
 const Register = ({onRouteChange, loadUser}) => {
   const [email, setEmail] = useState("");
@@ -18,22 +19,24 @@ const Register = ({onRouteChange, loadUser}) => {
   };
 
   const onSubmitSignIn = () => {
-    fetch("https://smart-brain-backend-b21u.onrender.com/register", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        email: email,
-        password: password,
-        name: name,
-      }),
-    })
-      .then((res) => res.json())
-      .then((user) => {
-        if (user.id) {
-          loadUser(user);
-          onRouteChange("home");
-        }
-      });
+    trackPromise(
+      fetch("https://smart-brain-backend-b21u.onrender.com/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          name: name,
+        }),
+      })
+        .then((res) => res.json())
+        .then((user) => {
+          if (user.id) {
+            loadUser(user);
+            onRouteChange("home");
+          }
+        })
+    );
   };
 
   return (
