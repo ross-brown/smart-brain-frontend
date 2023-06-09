@@ -23,42 +23,6 @@ function App() {
     joined: "",
   });
 
-  const returnRequestOptions = (imageURL) => {
-    const PAT = "2ca083bd7a5f47a786f0d591d0d75cdf";
-    const USER_ID = "clarifai";
-    const APP_ID = "main";
-    // const MODEL_ID = "general-image-recognition";
-    // const MODEL_VERSION_ID = "aa7f35c01e0642fda5cf400f543e7c40";
-    const IMAGE_URL = imageURL;
-
-    const raw = JSON.stringify({
-      user_app_id: {
-        user_id: USER_ID,
-        app_id: APP_ID,
-      },
-      inputs: [
-        {
-          data: {
-            image: {
-              url: IMAGE_URL,
-            },
-          },
-        },
-      ],
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: "Key " + PAT,
-      },
-      body: raw,
-    };
-
-    return requestOptions;
-  };
-
   const loadUser = (data) => {
     setUser({
       id: data.id,
@@ -70,6 +34,7 @@ function App() {
   };
 
   const calculateFaceLocation = (data) => {
+    console.log("data thats passed into calcFaceLoc: ", data);
     const clarifaiFace =
       data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById("inputimage");
@@ -93,11 +58,11 @@ function App() {
 
   const onPictureSubmit = () => {
     setImageUrl(input);
-
-    fetch(
-      `https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs`,
-      returnRequestOptions(input)
-    )
+    fetch("http://localhost:3000/imageurl", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({input}),
+    })
       .then((response) => response.json())
       .then((result) => {
         if (result) {
